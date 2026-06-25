@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>AgroPilot</title>
+    <style>
+      /* === Paleta Orgánica Personalizada === 
+           #5A8A3A (Verde Medio)
+           #8EC849 (Verde Lima/Vivo)
+           #3A5B29 (Verde Oscuro Profundo)
+           #D7E7D5 (Verde Pastel Claro)
+        */
+
+      /* === Variables Modo Oscuro (Desaturado y Elegante) === */
+      :root {
+        /* Fondos neutros oscuros (Gris carbón verdoso) para no fatigar la vista */
+        --bg-main: #161a14;
+        --bg-card: #1e241b;
+        --bg-card-hover: #272f23;
+
+        --text-main: #d7e7d5;
+        --text-muted: #9bae98; /* Un tono más neutro para textos secundarios */
+
+        /* Los colores de tu paleta se mantienen puros para los acentos */
+        --brand-primary: #5a8a3a;
+        --brand-accent: #8ec849;
+        --brand-light: #d7e7d5;
+        --brand-dark: #3a5b29;
+
+        --border-radius-bento: 28px;
+        --border-color: rgba(
+          215,
+          231,
+          213,
+          0.08
+        ); /* Bordes mucho más sutiles */
+      }
+
+      /* === Variables Modo Claro === */
+      [data-theme='light'] {
+        --bg-main: #f0f5ef; /* Un tono casi blanco derivado del D7E7D5 */
+        --bg-card: #d7e7d5;
+        --bg-card-hover: #cbe0c9;
+        --text-main: #161a14; /* Texto principal bien oscuro para contraste */
+        --text-muted: #3a5b29;
+
+        --border-color: rgba(58, 91, 41, 0.15);
+      }
+
+      /* === Estilos Base === */
+      * {
+        box-sizing: border-box;
+        transition: background-color 0.4s ease, color 0.4s ease,
+          border-color 0.4s ease;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      /* === Estructura Bento Grid === */
+      .dashboard-container {
+        width: 100%;
+        max-width: 1200px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: minmax(180px, auto);
+        gap: 20px;
+      }
+
+      /* === Tarjetas (Bento Items) === */
+      .bento-card {
+        background-color: var(--bg-card);
+        border-radius: var(--border-radius-bento);
+        padding: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .bento-card:hover {
+        background-color: var(--bg-card-hover);
+      }
+
+      .card-title {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .header-card {
+        grid-column: span 4;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(
+          135deg,
+          var(--bg-card) 0%,
+          rgba(90, 138, 58, 0.2) 100%
+        );
+        color: var(--text-main);
+      }
+
+      [data-theme='light'] .header-card {
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='%235A8A3A' fill-opacity='0.08' fill-rule='evenodd'/%3E%3C/svg%3E");
+        color: var(--brand-dark);
+      }
+
+      .weather-card {
+        grid-column: span 2;
+      }
+
+      .sensor-card {
+        grid-column: span 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .ai-chat-card {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
+
+      .map-card {
+        grid-column: span 2;
+        padding: 0;
+      }
+
+      .water-card {
+        grid-column: span 2;
+      }
+
+      /* === Elementos Visuales === */
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 10px 0;
+        color: var(--text-main);
+      }
+
+      .metric-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      /* === Módulo de Mapa Simulado === */
+      .map-container {
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        background-color: #1a2217; /* Fondo del mapa sutil */
+        background-image: repeating-radial-gradient(
+          circle at 70% 30%,
+          transparent 0,
+          transparent 15px,
+          rgba(142, 200, 73, 0.05) 16px,
+          rgba(142, 200, 73, 0.05) 17px
+        );
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      [data-theme='light'] .map-container {
+        background-color: var(--brand-primary);
+        background-image: repeating-radial-gradient(
+          circle at 70% 30%,
+          transparent 0,
+          transparent 15px,
+          rgba(58, 91, 41, 0.19) 16px,
+          rgba(58, 91, 41, 0.19) 17px
+        );
+      }
+
+      .map-label {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: var(--bg-card);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        z-index: 10;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .map-pin {
+        width: 16px;
+        height: 16px;
+        background-color: var(--brand-accent);
+        border-radius: 50%;
+        position: relative;
+        z-index: 2;
+        border: 3px solid var(--bg-main);
+      }
+
+      .radar-pulse {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background-color: var(--brand-accent);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+        opacity: 0.5;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.2);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+
+      /* === Gráfico Circular === */
+      .pie-chart {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: conic-gradient(
+          var(--brand-dark) 0% 40%,
+          var(--brand-primary) 40% 85%,
+          var(--brand-accent) 85% 100%
+        );
+        margin: 0 auto 15px auto;
+        border: 4px solid var(--bg-card);
+      }
+
+      /* === Estilos del Chat IA === */
+      .chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .chat-bubble {
+        padding: 14px 18px;
+        border-radius: 20px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        max-width: 90%;
+      }
+
+      .bubble-ai {
+        background: rgba(90, 138, 58, 0.2); /* Fondo sutil para el mensaje IA */
+        color: var(--text-main);
+        border-top-left-radius: 4px;
+        align-self: flex-start;
+        border: 1px solid rgba(142, 200, 73, 0.1);
+      }
+
+      [data-theme='light'] .bubble-ai {
+        background: var(--brand-dark);
+        color: var(--brand-light);
+      }
+
+      .chat-input {
+        margin-top: auto;
+        display: flex;
+        gap: 10px;
+        background: var(--bg-main);
+        padding: 12px;
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+      }
+
+      .chat-input input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        outline: none;
+        padding: 0 10px;
+        font-family: inherit;
+      }
+
+      .chat-input input::placeholder {
+        color: var(--text-muted);
+      }
+
+      /* Topográfico SVG Background sutil para el Header */
+      .topo-bg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='%23D7E7D5' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .theme-toggle {
+        background: var(--bg-main);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        padding: 10px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .theme-toggle:hover {
+        border-color: var(--brand-accent);
+      }
+
+      /* === Responsive === */
+      @media (max-width: 900px) {
+        .dashboard-container {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .header-card {
+          grid-column: span 2;
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .dashboard-container {
+          grid-template-columns: 1fr;
+        }
+        .header-card,
+        .weather-card,
+        .sensor-card,
+        .ai-chat-card,
+        .water-card,
+        .map-card {
+          grid-column: span 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <div class="bento-card header-card">
+        <div id="bg-card-title" class="topo-bg"></div>
+        <div style="z-index: 1">
+          <h1 style="margin: 0; font-size: 1.6rem; letter-spacing: -0.5px">
+            Panel Agrícola
+          </h1>
+          <p
+            style="
+              margin: 5px 0 0 0;
+              opacity: 0.8;
+              font-weight: 500;
+              display: flex;
+              gap: 8px;
+              align-items: center;
+            "
+          >
+            <i data-feather="map-pin"></i>
+            Monitoreo de Cultivos Activos
+          </p>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" style="z-index: 1">
+          <span
+            id="theme-icon"
+            style="display: flex; gap 8px; align-items: center;"
+          >
+            <i data-feather="sun"></i>
+          </span>
+          Cambiar Tema
+        </button>
+      </div>
+
+      <div class="bento-card map-card">
+        <div
+          class="map-label"
+          style="display: flex; gap: 8px; align-items: center"
+        >
+          <i data-feather="map-pin"></i>
+          Zona 1: Cultivo Norte
+        </div>
+        <div class="map-container">
+          <div class="radar-pulse"></div>
+          <div class="map-pin"></div>
+        </div>
+      </div>
+
+      <div class="bento-card weather-card">
+        <div
+          class="card-title"
+          style="
+            color: var(--brand-accent);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+          "
+        >
+          <i data-feather="cloud"></i>
+          Pronóstico Local
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div>
+            <div class="metric-value">16°C</div>
+            <div class="metric-label">Nubosidad Media</div>
+          </div>
+          <div style="text-align: right">
+            <div
+              style="
+                color: var(--brand-accent);
+                font-size: 1.5rem;
+                font-weight: bold;
+              "
+            >
+              65%
+            </div>
+            <div class="metric-label">Prob. de lluvia</div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bento-card sensor-card"
+        style="
+          background-color: var(--brand-accent);
+          color: var(--bg-main);
+          border: none;
+        "
+      >
+        <div>
+          <div
+            class="card-title"
+            style="color: var(--bg-main); justify-content: center"
+          >
+            Humedad Suelo
+          </div>
+          <div class="metric-value" style="color: var(--bg-main)">78%</div>
+          <div class="metric-label" style="color: rgba(22, 26, 20, 0.8)">
+            Nivel Óptimo
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card sensor-card">
+        <div>
+          <div class="card-title" style="justify-content: center">
+            Viento (km/h)
+          </div>
+          <div class="metric-value">12.4</div>
+          <div class="metric-label">Dirección NE</div>
+        </div>
+      </div>
+
+      <div class="bento-card ai-chat-card">
+        <div
+          class="card-title"
+          style="
+            color: var(--brand-accent);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+          "
+        >
+          <i data-feather="help-circle"></i>
+          AgroPilot
+        </div>
+        <div class="chat-area">
+          <div class="chat-bubble bubble-ai">
+            <strong>Análisis de Suelo Activo:</strong> Las lecturas indican un
+            descenso de temperatura para esta noche.<br /><br />
+            El riesgo de helada es bajo, pero sugiero posponer la aplicación de
+            fertilizante foliar hasta mañana después de las 9:00 AM para mejor
+            absorción.
+          </div>
+        </div>
+        <div class="chat-input">
+          <span
+            style="
+              padding-left: 10px;
+              cursor: pointer;
+              color: var(--brand-primary);
+              display: flex;
+              gap: 8px;
+              align-items: center;
+            "
+          >
+            <i data-feather="mic"></i>
+          </span>
+          <input type="text" placeholder="Pregunta qué sembrar en tu zona..." />
+          <button
+            style="
+              background: var(--brand-accent);
+              border: none;
+              border-radius: 50%;
+              width: 38px;
+              height: 38px;
+              color: var(--bg-main);
+              cursor: pointer;
+              font-weight: bold;
+            "
+          >
+            ➤
+          </button>
+        </div>
+      </div>
+
+      <div class="bento-card water-card">
+        <div
+          class="card-title"
+          style="display: flex; gap: 8px; align-items: center"
+        >
+          <i data-feather="droplet"></i>
+          Estado Hídrico Semanal
+        </div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-top: 10px;
+          "
+        >
+          <div class="pie-chart"></div>
+          <div>
+            <div style="margin-bottom: 10px; font-weight: 600">
+              <span style="color: var(--brand-dark)">●</span> Humedad (40%)
+            </div>
+            <div style="margin-bottom: 10px; font-weight: 600">
+              <span style="color: var(--brand-primary)">●</span> Riego Activo
+              (45%)
+            </div>
+            <div style="font-weight: 600">
+              <span style="color: var(--brand-accent)">●</span> Evaporación
+              (15%)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleTheme() {
+        const html = document.documentElement;
+        const themeIcon = document.getElementById('theme-icon');
+        const currentTheme = html.getAttribute('data-theme');
+        const card = document.getElementById('bg-card-title');
+
+        if (currentTheme === 'dark') {
+          html.setAttribute('data-theme', 'light');
+          themeIcon.innerHTML = '<i data-feather="moon"></i>';
+        } else {
+          html.setAttribute('data-theme', 'dark');
+          themeIcon.innerHTML = '<i data-feather="sun"></i>';
+        }
+
+        feather.replace();
+      }
+    </script>
+
+    <!-- https://feathericons.com/ -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <script>
+      feather.replace();
+    </script>
+  </body>
+</html>

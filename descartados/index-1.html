@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgroPilot</title>
+    <style>
+      /* === Variables Modo Oscuro (Por Defecto - Basado en la Imagen 2) === */
+      :root {
+        --bg-main: #121212;
+        --bg-card: #1e1e1e;
+        --bg-card-hover: #252525;
+        --text-main: #f3f4f6;
+        --text-muted: #9ca3af;
+
+        --accent-green: #10b981; /* Verde Esmeralda / Vida */
+        --accent-mustard: #f59e0b; /* Alertas / Cosecha */
+        --accent-blue: #3b82f6; /* Agua / Clima */
+
+        --border-radius-bento: 28px;
+        --border-color: rgba(255, 255, 255, 0.05);
+      }
+
+      /* === Variables Modo Claro === */
+      [data-theme='light'] {
+        --bg-main: #f4f6f8; /* Blanco Hueso / Arena Soft */
+        --bg-card: #ffffff;
+        --bg-card-hover: #f9fafb;
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+
+        --accent-green: #059669;
+        --accent-mustard: #d97706;
+        --accent-blue: #2563eb;
+
+        --border-color: rgba(0, 0, 0, 0.05);
+      }
+
+      /* === Estilos Base === */
+      * {
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      /* === Estructura Bento Grid === */
+      .dashboard-container {
+        width: 100%;
+        max-width: 1200px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: minmax(180px, auto);
+        gap: 20px;
+      }
+
+      /* === Estilos de las Tarjetas (Bento Items) === */
+      .bento-card {
+        background-color: var(--bg-card);
+        border-radius: var(--border-radius-bento);
+        padding: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .bento-card:hover {
+        background-color: var(--bg-card-hover);
+      }
+
+      .card-title {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* === Tamaños Específicos del Bento === */
+      .header-card {
+        grid-column: span 4;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(
+          135deg,
+          var(--bg-card) 0%,
+          rgba(16, 185, 129, 0.1) 100%
+        );
+      }
+
+      .weather-card {
+        grid-column: span 2;
+      }
+      .sensor-card {
+        grid-column: span 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .ai-chat-card {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
+
+      .tasks-card {
+        grid-column: span 2;
+      }
+      .alert-card {
+        grid-column: span 2;
+        background-color: rgba(245, 158, 11, 0.1);
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+
+      /* === Elementos Visuales === */
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 10px 0;
+        color: var(--text-main);
+      }
+
+      .metric-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      /* Gráfico Circular Simplificado (CSS puro) */
+      .pie-chart {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: conic-gradient(
+          var(--accent-blue) 0% 40%,
+          var(--accent-green) 40% 85%,
+          var(--accent-mustard) 85% 100%
+        );
+        margin: 0 auto 15px auto;
+      }
+
+      /* Lista de Tareas */
+      .task-item {
+        background: var(--bg-main);
+        padding: 16px;
+        border-radius: 16px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .tag-urgent {
+        background: rgba(245, 158, 11, 0.2);
+        color: var(--accent-mustard);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+      }
+
+      /* Estilos del Chat IA */
+      .chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .chat-bubble {
+        padding: 14px 18px;
+        border-radius: 20px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        max-width: 90%;
+      }
+
+      .bubble-ai {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--text-main);
+        border-top-left-radius: 4px;
+        align-self: flex-start;
+      }
+
+      .chat-input {
+        margin-top: auto;
+        display: flex;
+        gap: 10px;
+        background: var(--bg-main);
+        padding: 10px;
+        border-radius: 24px;
+      }
+
+      .chat-input input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        outline: none;
+        padding: 0 10px;
+      }
+
+      /* Topográfico SVG Background sutil */
+      .topo-bg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='%239CA3AF' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .theme-toggle {
+        background: var(--bg-main);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        padding: 10px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      /* === Responsive === */
+      @media (max-width: 900px) {
+        .dashboard-container {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .header-card {
+          grid-column: span 2;
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .dashboard-container {
+          grid-template-columns: 1fr;
+        }
+        .header-card,
+        .weather-card,
+        .sensor-card,
+        .ai-chat-card,
+        .tasks-card,
+        .alert-card {
+          grid-column: span 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <div class="bento-card header-card">
+        <div class="topo-bg"></div>
+        <div style="z-index: 1">
+          <h1 style="margin: 0; font-size: 1.5rem">
+            Finca "El Mirador" - Sogamoso
+          </h1>
+          <p style="margin: 5px 0 0 0; color: var(--text-muted)">
+            Piso Térmico: Frío | 2,569 msnm
+          </p>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" style="z-index: 1">
+          ☀️ Cambiar Tema
+        </button>
+      </div>
+
+      <div class="bento-card weather-card">
+        <div class="card-title">☁️ Clima Local</div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div>
+            <div class="metric-value">14°C</div>
+            <div class="metric-label">Parcialmente Nublado</div>
+          </div>
+          <div style="text-align: right">
+            <div style="color: var(--accent-blue); font-weight: bold">65%</div>
+            <div class="metric-label">Prob. de lluvia</div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bento-card sensor-card"
+        style="background-color: var(--accent-green); color: white"
+      >
+        <div>
+          <div
+            class="card-title"
+            style="color: rgba(255, 255, 255, 0.8); justify-content: center"
+          >
+            Humedad Suelo
+          </div>
+          <div class="metric-value" style="color: white">78%</div>
+          <div class="metric-label" style="color: rgba(255, 255, 255, 0.8)">
+            Nivel Óptimo
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card sensor-card">
+        <div>
+          <div class="card-title" style="justify-content: center">
+            Evapotranspiración
+          </div>
+          <div class="metric-value">
+            3.2<span style="font-size: 1rem">mm</span>
+          </div>
+          <div class="metric-label">Diario</div>
+        </div>
+      </div>
+
+      <div class="bento-card ai-chat-card">
+        <div class="card-title" style="color: var(--accent-green)">
+          🤖 AgroAsistente IA
+        </div>
+        <div class="chat-area">
+          <div class="chat-bubble bubble-ai">
+            <strong>Alerta Fenómeno del Niño:</strong> Se prevén heladas
+            moderadas en la madrugada de mañana en Boyacá. <br /><br />
+            Sugerencia: Activa los sistemas de riego por aspersión a las 3:00 AM
+            para proteger el cultivo de papa.
+          </div>
+        </div>
+        <div class="chat-input">
+          <span style="padding-left: 10px">🎤</span>
+          <input type="text" placeholder="Pregunta sobre tu cultivo..." />
+          <button
+            style="
+              background: var(--accent-green);
+              border: none;
+              border-radius: 50%;
+              width: 35px;
+              height: 35px;
+              color: white;
+              cursor: pointer;
+            "
+          >
+            ➤
+          </button>
+        </div>
+      </div>
+
+      <div class="bento-card tasks-card">
+        <div class="card-title">💧 Distribución Hídrica</div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-top: 10px;
+          "
+        >
+          <div class="pie-chart"></div>
+          <div>
+            <div style="margin-bottom: 10px">
+              <span style="color: var(--accent-blue)">●</span> Lluvia (40%)
+            </div>
+            <div style="margin-bottom: 10px">
+              <span style="color: var(--accent-green)">●</span> Riego (45%)
+            </div>
+            <div>
+              <span style="color: var(--accent-mustard)">●</span> Déficit (15%)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card tasks-card">
+        <div class="card-title">📋 Tareas del Día</div>
+        <div class="task-item">
+          <div>
+            <strong style="display: block; margin-bottom: 5px"
+              >Revisión de plagas</strong
+            >
+            <span class="metric-label">Lote 4 - Papa Única</span>
+          </div>
+          <span class="tag-urgent">Urgente</span>
+        </div>
+        <div class="task-item">
+          <div>
+            <strong style="display: block; margin-bottom: 5px"
+              >Calibración de riego</strong
+            >
+            <span class="metric-label">Válvula Principal</span>
+          </div>
+          <span style="color: var(--accent-green); font-weight: bold">✓</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+          html.setAttribute('data-theme', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+        }
+      }
+    </script>
+  </body>
+</html>

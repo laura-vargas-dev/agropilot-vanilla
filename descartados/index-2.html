@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgroPilot</title>
+    <style>
+      /* === Variables Dinámicas (Modo Claro por Defecto) === */
+      :root {
+        --bg-main: #f4f6f7;
+        --bg-panel: #ffffff;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --border-color: #d5d8dc;
+
+        --brand-primary: #0b5345;
+        --brand-accent: #2e86c1;
+
+        --alert-bg: #fdf2e9;
+        --alert-border: #e67e22;
+        --alert-text: #d35400;
+
+        --msg-user-bg: #e5e8e8;
+        --msg-user-text: #2c3e50;
+        --msg-ai-bg: #0b5345;
+        --msg-ai-text: #ffffff;
+
+        --btn-hover: #083c32;
+      }
+
+      /* === Variables Modo Oscuro (Campo de Alta Gama) === */
+      [data-theme='dark'] {
+        --bg-main: #0b1914; /* Verde Bosque Nocturno */
+        --bg-panel: #142b23;
+        --text-main: #e5e8e8;
+        --text-muted: #aab7b8;
+        --border-color: #1f3d32;
+
+        --brand-primary: #2ecc71; /* Verde Menta IA */
+        --brand-accent: #00d2ff;
+
+        --alert-bg: #2e1a0f;
+        --alert-border: #e67e22;
+        --alert-text: #f39c12;
+
+        --msg-user-bg: #1f3d32;
+        --msg-user-text: #e5e8e8;
+        --msg-ai-bg: #2ecc71;
+        --msg-ai-text: #0b1914;
+
+        --btn-hover: #27ae60;
+      }
+
+      /* === Reset y Estilos Base === */
+      * {
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, color 0.3s ease,
+          border-color 0.3s ease;
+      }
+
+      body {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .layout-container {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        max-width: 1440px;
+        margin: 0 auto;
+        background-color: var(--bg-main);
+      }
+
+      /* === Lado Izquierdo: Tablero de Datos === */
+      .panel-left {
+        width: 60%;
+        padding: 30px;
+        overflow-y: auto;
+      }
+
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg-panel);
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+        border-left: 6px solid var(--brand-primary);
+      }
+
+      .location-info {
+        font-size: 1.05rem;
+      }
+
+      /* Botón Modo Oscuro/Claro */
+      .theme-toggle {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .theme-toggle:hover {
+        background: var(--border-color);
+      }
+
+      .cards-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+
+      .data-card {
+        background: var(--bg-panel);
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+      }
+
+      .data-card h3 {
+        margin: 0 0 10px 0;
+        color: var(--brand-accent);
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .data-card p {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: bold;
+      }
+
+      .data-card span {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-top: 6px;
+      }
+
+      .alert-banner {
+        background: var(--alert-bg);
+        border: 1px solid var(--alert-border);
+        border-left: 6px solid var(--alert-border);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
+
+      .alert-banner strong {
+        color: var(--alert-text);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+      }
+
+      .recommendation-table {
+        background: var(--bg-panel);
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+      }
+
+      .recommendation-table h3 {
+        margin: 0 0 15px 0;
+        color: var(--brand-primary);
+      }
+
+      /* === Lado Derecho: Interfaz del Chatbot === */
+      .panel-right {
+        width: 40%;
+        background: var(--bg-panel);
+        border-left: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.03);
+      }
+
+      .chat-header {
+        background: var(--brand-primary);
+        color: var(--msg-ai-text);
+        padding: 20px 24px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* En modo oscuro, el texto del header debe ajustarse si el fondo es verde menta claro */
+      [data-theme='dark'] .chat-header {
+        color: #0b1914;
+      }
+
+      .chat-header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .chat-header p {
+        margin: 5px 0 0 0;
+        font-size: 0.85rem;
+        opacity: 0.9;
+      }
+
+      .chat-history {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .msg-bubble {
+        max-width: 85%;
+        padding: 14px 18px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      .msg-user {
+        background: var(--msg-user-bg);
+        color: var(--msg-user-text);
+        align-self: flex-end;
+        border-bottom-right-radius: 2px;
+      }
+
+      .msg-ai {
+        background: var(--msg-ai-bg);
+        color: var(--msg-ai-text);
+        align-self: flex-start;
+        border-bottom-left-radius: 2px;
+      }
+
+      .quick-replies {
+        padding: 0 24px 16px 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .btn-pill {
+        background: transparent;
+        border: 1px solid var(--brand-primary);
+        color: var(--text-main);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-pill:hover {
+        background: var(--brand-primary);
+        color: var(--msg-ai-text);
+      }
+
+      [data-theme='dark'] .btn-pill:hover {
+        color: #0b1914;
+      }
+
+      .chat-input-area {
+        padding: 20px 24px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        background: var(--bg-main);
+      }
+
+      .input-box {
+        flex: 1;
+        padding: 14px 20px;
+        background: var(--bg-panel);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        outline: none;
+        font-size: 0.95rem;
+      }
+
+      .input-box:focus {
+        border-color: var(--brand-primary);
+      }
+
+      .btn-icon {
+        background: var(--brand-primary);
+        color: var(--msg-ai-text);
+        border: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+      }
+
+      [data-theme='dark'] .btn-icon {
+        color: #0b1914;
+      }
+
+      .btn-icon-outline {
+        background: transparent;
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+      }
+
+      /* === RESPONSIVE (Móviles y Tablets) === */
+      @media (max-width: 900px) {
+        body {
+          overflow: auto; /* Permite scroll en toda la página */
+          height: auto;
+        }
+
+        .layout-container {
+          flex-direction: column;
+        }
+
+        .panel-left,
+        .panel-right {
+          width: 100%;
+          border-left: none;
+        }
+
+        .panel-right {
+          height: 80vh; /* El chatbot toma altura fija en móvil para poder chatear */
+          border-top: 2px solid var(--border-color);
+        }
+
+        .cards-grid {
+          grid-template-columns: 1fr; /* Tarjetas apiladas en móvil */
+        }
+
+        .header-top {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout-container">
+      <!-- LADO IZQUIERDO: Tablero de Datos -->
+      <div class="panel-left">
+        <div class="header-top">
+          <div class="location-info">
+            📍 <strong>Sogamoso, Boyacá</strong> <br />
+            <span style="font-size: 0.85rem; color: var(--text-muted)"
+              >Altura: 2,569 msnm | Piso Térmico: Frío</span
+            >
+          </div>
+          <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">🌙</span> Modo Oscuro
+          </button>
+        </div>
+
+        <div class="cards-grid">
+          <div class="data-card">
+            <h3>Clima Actual</h3>
+            <p>14°C</p>
+            <span>Humedad: 78% | Prob. Lluvia: 15%</span>
+          </div>
+          <div class="data-card">
+            <h3>Estado del Suelo</h3>
+            <p>Condiciones Moderadas</p>
+            <span>Basado en patrones de lluvia de la última semana.</span>
+          </div>
+        </div>
+
+        <div class="alert-banner">
+          <strong>⚠️ Monitoreo: Fenómeno del Niño</strong>
+          Los análisis meteorológicos recientes del IDEAM indican una
+          disminución del 30% en las precipitaciones históricas para este
+          trimestre en el Valle de Sugamuxi. <br /><br />
+          <em style="color: var(--text-main)"
+            >Recomendación IA: Priorizar la instalación de riego por goteo para
+            optimizar recursos hídricos en las próximas 6 semanas.</em
+          >
+        </div>
+
+        <div class="recommendation-table">
+          <h3>🌱 Sugerencias de Cultivo (Ciclo Actual)</h3>
+          <ul style="line-height: 1.8; margin: 0; padding-left: 20px">
+            <li>
+              <strong>Principal:</strong> Papa Única (Alta resistencia a sequías
+              cortas).
+            </li>
+            <li>
+              <strong>Alternativa:</strong> Maíz Forrajero (Adaptabilidad
+              comprobada en la zona plana).
+            </li>
+            <li>
+              <strong>Evitar:</strong> Hortalizas de hoja (Alta demanda
+              hídrica).
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- LADO DERECHO: Chatbot IA -->
+      <div class="panel-right">
+        <div class="chat-header">
+          <h2>🤖 AgroAsistente IA - Boyacá</h2>
+          <p>Análisis predictivo basado en datos oficiales y agronómicos.</p>
+        </div>
+
+        <div class="chat-history">
+          <div class="msg-bubble msg-user">
+            Hola. Tengo un terreno en las afueras de Sogamoso. Quiero sembrar
+            este mes pero me preocupan las heladas del Fenómeno del Niño. ¿Qué
+            me recomiendas?
+          </div>
+          <div class="msg-bubble msg-ai">
+            ¡Hola! Basado en los datos de altitud y las proyecciones
+            meteorológicas, el riesgo de heladas de madrugada aumentará en las
+            próximas 3 semanas. <br /><br />Te recomiendo evitar cultivos de
+            alta sensibilidad. En su lugar, puedes optar por
+            <strong>maíz</strong> o preparar el suelo con coberturas orgánicas
+            (acolchados) para proteger las raíces del frío nocturno.
+            <br /><br />¿Deseas que genere un plan de siembra adaptado a estas
+            condiciones?
+          </div>
+        </div>
+
+        <div class="quick-replies">
+          <button class="btn-pill">📋 Plan de siembra</button>
+          <button class="btn-pill">💧 Calcular riego</button>
+          <button class="btn-pill">📉 Datos de heladas</button>
+        </div>
+
+        <div class="chat-input-area">
+          <button class="btn-icon-outline">🎤</button>
+          <input
+            type="text"
+            class="input-box"
+            placeholder="Pregúntale al AgroAsistente..."
+          />
+          <button class="btn-icon">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script para cambiar entre Light / Dark Mode -->
+    <script>
+      function toggleTheme() {
+        const html = document.documentElement;
+        const themeIcon = document.getElementById('theme-icon');
+        const currentTheme = html.getAttribute('data-theme');
+
+        if (currentTheme === 'light') {
+          html.setAttribute('data-theme', 'dark');
+          themeIcon.textContent = '☀️';
+          themeIcon.nextSibling.textContent = ' Modo Claro';
+        } else {
+          html.setAttribute('data-theme', 'light');
+          themeIcon.textContent = '🌙';
+          themeIcon.nextSibling.textContent = ' Modo Oscuro';
+        }
+      }
+    </script>
+  </body>
+</html>
